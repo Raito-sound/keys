@@ -722,7 +722,7 @@ export default function Keys() {
   return (
     <div className="keys-app">
       <header className="appbar">
-<a className="studio-brand" href="https://raito.studio/" aria-label="Raito Studio home"><span className="studio-mark" aria-hidden="true"></span><span className="studio-wordmark"><strong>Raito</strong> Studio Tools</span></a><nav className="studio-nav" aria-label="Raito Studio apps"><a href="https://tally.raito.studio/" title="Write and analyze text, character counts and lyrics.">TALLY</a><a href="https://carve.raito.studio/" title="Trim, edit and export audio in your browser.">CARVE</a><a href="https://keys.raito.studio/" aria-current="page" title="Play piano and organ, practice and record ideas.">KEYS</a><a href="https://raito-pitch.raito853161.chatgpt.site/" title="Tune guitar, bass and other instruments.">PITCH</a></nav>
+<a className="studio-brand" href="https://raito.studio/" aria-label="Raito Studio home"><span className="studio-mark" aria-hidden="true"></span><span className="studio-wordmark"><strong>Raito</strong> Studio Tools</span></a><nav className="studio-nav" aria-label="Raito Studio apps"><a href="https://tally.raito.studio/" title="Write and analyze text, character counts and lyrics.">TALLY</a><a href="https://carve.raito.studio/" title="Trim, edit and export audio in your browser.">CARVE</a><a href="https://keys.raito.studio/" aria-current="page" title="Play piano and organ, practice and record ideas.">KEYS</a><a href="https://pitch.raito.studio/" title="Tune guitar, bass and other instruments.">PITCH</a></nav>
         <div className="appbar-right">
           <Button
             variant="ghost"
