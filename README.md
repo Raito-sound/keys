@@ -1,6 +1,6 @@
 # KEYS — Play / Practice / Capture
 
-Local prototype of a browser keyboard for Raito / Lisa Records, using the light/dark visual language of TALLY and CARVE. The interface is in English. It has not been published or connected to a production domain.
+Free browser piano and organ by Raito / Lisa-Rec K.K., using the light/dark visual language of TALLY and CARVE. The interface supports English and Japanese and is published at [keys.raito.studio](https://keys.raito.studio/).
 
 ## Run
 
@@ -11,11 +11,11 @@ npm install
 npm run dev -- --host 127.0.0.1 --port 18768
 ```
 
-Open http://localhost:18768 and click **Enable audio**. Use an English keyboard input source.
+Open http://localhost:18768 and click **Start playing**. Piano samples begin loading automatically; the first click is still required by browser audio policies. Use an English keyboard input source when playing with letter keys.
 
 ## Features
 
-- 29 piano notes spanning C3–E5 by default, with 34 physical key bindings and up to 64 audio voices. Lower-row continuation `, L . ; /` overlaps upper-row `Q 2 W 3 E`, with independent note releases.
+- 29 piano notes spanning C3–E5 by default, with 36 physical key-code bindings and up to 64 audio voices. Lower-row continuation `, L . ; / _` overlaps upper-row `Q 2 W 3 E R`, with independent note releases. The Japanese `IntlRo` key and US-layout `Shift` + `-` both cover `_`.
 - Compact viewport-oriented layout, optional fullscreen button, and a collapsible recorder beneath the play settings and metronome.
 - Sampled grand piano and additive tonewheel-style organ.
 - Touch/mouse piano keyboard with pointer capture, glissando and multi-touch.
@@ -48,8 +48,8 @@ Tests cover polyphonic release/cancellation, note mapping, chord identification,
 
 App and sample HTTP endpoints were verified locally. The optional `document.modelContext` tools (`read_keys_state`, `configure_keys`) are feature-detected and cleaned up on unmount. No supported live WebMCP validation surface was available, so actual browser registration has not been verified.
 
-## Before public release
+## Current limitations
 
 Play-test piano release/reverb, organ level, chord voicings, loop transitions and exports in the intended browsers. Keyboard rollover is limited by hardware; MIDI controller input is not implemented. Chord recognition is a practical label for common exact pitch-class sets, not harmonic analysis. PC keys do not report touch velocity. Touch users can scroll the keyboard horizontally to reach the upper notes.
 
-The scaffold retains Sites-compatible build configuration; no Site registration, GitHub repository or deployment was created. Production hosting can be chosen once the instrument is ready to publish.
+The app is deployed through OpenAI Sites and served on the custom domain `keys.raito.studio`.
