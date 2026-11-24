@@ -1,6 +1,19 @@
-/* oxlint-disable next/no-page-custom-font -- Global App Router layout, not a page-specific font link. */
 import type { Metadata } from 'next';
 import './globals.css';
+const webApplication = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  name: 'KEYS',
+  url: 'https://keys.raito.studio/',
+  description:
+    'A free browser piano and organ for practice, recording, MIDI export and WAV export.',
+  applicationCategory: 'MultimediaApplication',
+  operatingSystem: 'Any',
+  browserRequirements: 'Requires a modern browser with Web Audio API support.',
+  isAccessibleForFree: true,
+  offers: { '@type': 'Offer', price: 0, priceCurrency: 'JPY' },
+  creator: { '@id': 'https://raito.studio/#person' },
+};
 export const metadata: Metadata = {
   title: 'KEYS — Online Piano & Organ with Recording | Raito Studio Tools',
   description:
@@ -23,10 +36,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(webApplication) }}
         />
       </head>
       <body>{children}</body>
