@@ -172,6 +172,29 @@ svg {
   align-items: center;
   gap: 10px;
 }
+.language-switch {
+  display: flex;
+  align-items: center;
+  padding: 2px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--card);
+}
+.language-switch button {
+  min-height: 26px;
+  padding: 2px 8px;
+  border: 0;
+  border-radius: 2px;
+  color: var(--dim);
+  background: transparent;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+.language-switch button[aria-pressed='true'] {
+  color: var(--foreground);
+  background: var(--secondary);
+}
 .audio-led,
 .status-dot {
   width: 6px;
@@ -230,6 +253,7 @@ svg {
   background: var(--primary);
 }
 .panel {
+  position: relative;
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 6px;
@@ -507,27 +531,68 @@ kbd {
   font-size: 12px;
   gap: 8px;
 }
-.enable-audio {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 20px;
-  background: var(--secondary);
-  padding: 15px 22px;
-  border-top: 1px solid var(--border);
+.audio-gate {
+  position: absolute;
+  inset: 28px 0 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: color-mix(in srgb, var(--background) 72%, transparent);
+  backdrop-filter: blur(5px);
 }
-.enable-audio > div {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 5px 14px;
+.audio-gate-card {
+  display: grid;
+  justify-items: center;
+  width: min(92%, 430px);
+  padding: 30px 34px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--card) 95%, transparent);
+  box-shadow: 0 18px 50px rgba(35, 33, 29, 0.16);
+  text-align: center;
 }
-.enable-audio b {
-  font-weight: 600;
+.audio-gate-card .eyebrow {
+  margin-bottom: 7px;
 }
-.enable-audio span {
-  font-size: 13px;
+.audio-gate-card > strong {
+  color: var(--primary);
+  font-size: clamp(2rem, 5vw, 3.4rem);
+  line-height: 1;
+  letter-spacing: 0.06em;
+}
+.audio-gate-card p {
+  margin-top: 16px;
   color: var(--dim);
+}
+.audio-gate-card progress {
+  width: min(100%, 300px);
+  height: 5px;
+  margin: 14px 0 18px;
+  border: 0;
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--muted);
+  accent-color: var(--primary);
+}
+.audio-gate-card progress::-webkit-progress-bar {
+  background: var(--muted);
+}
+.audio-gate-card progress::-webkit-progress-value {
+  background: var(--primary);
+}
+.audio-gate-card button {
+  min-width: 210px;
+  min-height: 44px;
+  gap: 8px;
+  letter-spacing: 0.04em;
+}
+.audio-gate-card small {
+  max-width: 34rem;
+  margin-top: 13px;
+  color: var(--dim);
+  font-size: 11px;
+  line-height: 1.6;
 }
 .utility-grid {
   display: grid;
@@ -954,20 +1019,12 @@ kbd {
   .keyboard-footer > span {
     font-size: 11px;
   }
-  .enable-audio {
-    padding: 14px;
-    align-items: flex-start;
+  .audio-gate {
+    padding: 12px;
   }
-  .enable-audio > div {
-    display: block;
-  }
-  .enable-audio span {
-    display: block;
-    font-size: 12px;
-    margin-top: 3px;
-  }
-  .enable-audio button {
-    font-size: 12px;
+  .audio-gate-card {
+    width: min(96%, 390px);
+    padding: 24px 18px;
   }
   .session-footer {
     font-size: 11px;
@@ -1051,9 +1108,6 @@ kbd {
 }
 .keyboard-footer {
   padding: 3px 12px;
-}
-.enable-audio {
-  padding: 8px 14px;
 }
 .utility-grid {
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -1253,21 +1307,102 @@ kbd {
   }
 }
 
-@media (min-width: 761px) {
-  .keys-app:has(.enable-audio) .keyboard {
-    height: clamp(110px, calc(100dvh - 575px), 220px);
+/* Raito Studio Tools — shared application navigation */
+.studio-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  text-decoration: none;
+  color: inherit;
+}
+.studio-mark {
+  display: block;
+  width: 48px;
+  height: 28px;
+  background: currentColor;
+  mask: url('/raito-logo.svg') center/contain no-repeat;
+  -webkit-mask: url('/raito-logo.svg') center/contain no-repeat;
+}
+.studio-wordmark {
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+.studio-wordmark strong {
+  font-weight: 700;
+}
+.studio-nav {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+  margin-left: 8px;
+}
+.studio-nav a {
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  padding: 7px 9px;
+  text-decoration: none;
+  color: inherit;
+  opacity: 0.6;
+  border: 1px solid transparent;
+  border-radius: 3px;
+}
+.studio-nav a:hover,
+.studio-nav a[aria-current='page'] {
+  opacity: 1;
+  background: color-mix(in srgb, currentColor 7%, transparent);
+  border-color: color-mix(in srgb, currentColor 20%, transparent);
+}
+.studio-brand:focus-visible,
+.studio-nav a:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+@media (max-width: 620px) {
+  .studio-wordmark {
+    font-size: 12px;
+  }
+  .studio-mark {
+    width: 35px;
+    height: 23px;
+  }
+  .studio-brand {
+    gap: 6px;
+  }
+  .studio-nav {
+    margin-left: 0;
+  }
+  .studio-nav a {
+    padding: 6px;
+    font-size: 10px;
   }
 }
 
-/* Raito Studio Tools — shared application navigation */
-.studio-brand{display:flex;align-items:center;gap:10px;flex-shrink:0;text-decoration:none;color:inherit}
-.studio-mark{display:block;width:48px;height:28px;background:currentColor;mask:url('/raito-logo.svg') center/contain no-repeat;-webkit-mask:url('/raito-logo.svg') center/contain no-repeat}
-.studio-wordmark{font-family:'Chakra Petch',sans-serif;font-size:15px;font-weight:500;letter-spacing:.06em;white-space:nowrap}
-.studio-wordmark strong{font-weight:700}
-.studio-nav{display:flex;align-items:center;gap:3px;flex-shrink:0;margin-left:8px}
-.studio-nav a{font-family:'Chakra Petch',sans-serif;font-size:11px;font-weight:600;letter-spacing:.12em;padding:7px 9px;text-decoration:none;color:inherit;opacity:.6;border:1px solid transparent;border-radius:3px}
-.studio-nav a:hover,.studio-nav a[aria-current="page"]{opacity:1;background:color-mix(in srgb,currentColor 7%,transparent);border-color:color-mix(in srgb,currentColor 20%,transparent)}
-.studio-brand:focus-visible,.studio-nav a:focus-visible{outline:2px solid currentColor;outline-offset:3px}
-@media(max-width:620px){.studio-wordmark{font-size:12px}.studio-mark{width:35px;height:23px}.studio-brand{gap:6px}.studio-nav{margin-left:0}.studio-nav a{padding:6px;font-size:10px}}
-
-.appbar{height:50px;min-height:50px;gap:10px}.appbar .studio-nav{margin-right:auto}@media(max-width:700px){.appbar{height:auto;min-height:86px;flex-wrap:wrap;padding:6px 10px;gap:6px}.appbar-right{margin-left:auto}}
+.appbar {
+  height: 50px;
+  min-height: 50px;
+  gap: 10px;
+}
+.appbar .studio-nav {
+  margin-right: auto;
+}
+@media (max-width: 700px) {
+  .appbar {
+    height: auto;
+    min-height: 86px;
+    flex-wrap: wrap;
+    padding: 6px 10px;
+    gap: 6px;
+  }
+  .appbar-right {
+    flex: 1 0 100%;
+    justify-content: flex-end;
+    margin-left: 0;
+  }
+}

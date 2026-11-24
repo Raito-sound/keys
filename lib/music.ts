@@ -81,11 +81,16 @@ export const LOWER_CONTINUATION = [
   { code: 'Period', label: '.', offset: 14 },
   { code: 'Semicolon', label: ';', offset: 15 },
   { code: 'Slash', label: '/', offset: 16 },
+  { code: 'IntlRo', label: '_', offset: 17 },
 ];
+// Shift+Minus is the underscore key on common US layouts. IntlRo is the
+// dedicated underscore/ろ key on Japanese layouts.
+const KEY_ALIASES = [{ code: 'Minus', offset: 17 }];
 export const KEY_OFFSETS: Readonly<Record<string, number>> = Object.fromEntries(
   [
     ...KEY_CODES.map((code, offset) => [code, offset]),
     ...LOWER_CONTINUATION.map(({ code, offset }) => [code, offset]),
+    ...KEY_ALIASES.map(({ code, offset }) => [code, offset]),
   ],
 );
 export function labelsForOffset(offset: number): string[] {

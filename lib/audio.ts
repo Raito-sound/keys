@@ -162,13 +162,16 @@ export class KeyboardAudio {
   get analyser() {
     return this.network?.analyser ?? null;
   }
-  async start(onProgress: (n: number) => void = () => {}) {
+  private ensureContext() {
     if (this.context?.state === 'closed') this.context = null;
     if (!this.context) {
       this.context = new AudioContext({ latencyHint: 'interactive' });
       this.network = graph(this.context, this.patch);
     }
-    await this.context.resume();
+    return this.context;
+  }
+  async preload(onProgress: (n: number) => void = () => {}) {
+    const context = this.ensureContext();
     if (this.buffers.size === SAMPLE_MIDI.length) return;
     if (!this.loading) {
       this.loading = (async () => {
@@ -183,7 +186,7 @@ export class KeyboardAudio {
             if (!response.ok)
               throw new Error(`Could not load ${name}. Please retry.`);
             const data = await response.arrayBuffer();
-            this.buffers.set(midi, await this.context!.decodeAudioData(data));
+            this.buffers.set(midi, await context.decodeAudioData(data));
             onProgress(++loaded / SAMPLE_MIDI.length);
           }
         };
@@ -193,6 +196,11 @@ export class KeyboardAudio {
       });
     }
     return this.loading;
+  }
+  async start(onProgress: (n: number) => void = () => {}) {
+    const context = this.ensureContext();
+    const resumed = context.resume();
+    await Promise.all([resumed, this.preload(onProgress)]);
   }
   setPatch(patch: Patch) {
     this.patch = { ...patch };

@@ -147,6 +147,8 @@ test('lower-row continuation overlaps the upper octave without shifting either r
     ['Period', 'KeyW'],
     ['Semicolon', 'Digit3'],
     ['Slash', 'KeyE'],
+    ['IntlRo', 'KeyR'],
+    ['Minus', 'KeyR'],
   ]) {
     assert.equal(KEY_OFFSETS[lower], KEY_OFFSETS[upper]);
   }
@@ -154,5 +156,6 @@ test('lower-row continuation overlaps the upper octave without shifting either r
   assert.equal(KEY_OFFSETS.KeyM, 11);
   assert.equal(KEY_OFFSETS.Comma, 12);
   assert.deepEqual(labelsForOffset(12), ['Q', ',']);
+  assert.deepEqual(labelsForOffset(17), ['R', '_']);
   assert.equal(KEY_OFFSETS.KeyP, 28);
 });

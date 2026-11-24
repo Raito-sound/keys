@@ -61,6 +61,7 @@ class Context {
   sampleRate = 8000;
   destination = new Node();
   state = 'running';
+  resumeCount = 0;
   createGain() {
     return new Node();
   }
@@ -88,7 +89,9 @@ class Context {
   createBuffer(c, l) {
     return { getChannelData: () => new Float32Array(l) };
   }
-  async resume() {}
+  async resume() {
+    this.resumeCount++;
+  }
   async close() {}
   async decodeAudioData() {
     return {};
@@ -104,7 +107,10 @@ test('polyphonic voices have independent release and future notes are cancellabl
   });
   try {
     const engine = new KeyboardAudio();
+    await engine.preload();
+    assert.equal(engine.context.resumeCount, 0);
     await engine.start();
+    assert.equal(engine.context.resumeCount, 1);
     assert.equal(engine.buffers.size, 30);
     engine.noteOn('c', 60, 0.8);
     engine.noteOn('e', 64, 0.8);
