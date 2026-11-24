@@ -36,6 +36,7 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog';
 import { KeyboardAudio } from '@/lib/audio';
+import { isPedalCode, shouldIgnoreInstrumentKey } from '@/lib/keyboard';
 import { registerInstrumentTools } from '@/lib/webmcp';
 import {
   KEY_CODES,
@@ -177,6 +178,7 @@ export default function Keys() {
     voices = useRef(new Map<string, LiveNote>()),
     serial = useRef(0),
     pressed = useRef(new Set<string>()),
+    pedalPressed = useRef(new Set<string>()),
     recordStart = useRef(0),
     recording = useRef(false),
     captured = useRef<RecordedNote[]>([]),
@@ -286,8 +288,8 @@ export default function Keys() {
     audio.noteOn(id, midi, n.velocity);
     sync();
   };
-  const releasePedal = (latched: boolean, space: boolean) => {
-    if (!latched && !space) {
+  const releasePedal = (latched: boolean, momentary: boolean) => {
+    if (!latched && !momentary) {
       for (const [id, n] of voices.current) if (n.released) finishVoice(id);
       sync();
     }
@@ -296,6 +298,7 @@ export default function Keys() {
     for (const id of voices.current.keys()) finishVoice(id);
     sources.current.clear();
     pressed.current.clear();
+    pedalPressed.current.clear();
     setPedal(false);
     current.current.pedal = false;
     sync();
@@ -655,19 +658,15 @@ export default function Keys() {
       if (e.repeat || e.metaKey || e.ctrlKey || e.altKey || e.isComposing)
         return;
       const target = e.target as HTMLElement;
-      if (
-        target.closest(
-          'input,textarea,select,[role="slider"],[contenteditable="true"],[role="dialog"]',
-        )
-      )
-        return;
+      if (shouldIgnoreInstrumentKey(e.code, target)) return;
       if (e.code === 'Escape') {
         actions.current.panic();
         return;
       }
-      if (e.code === 'Space') {
-        if (target.closest('button')) return;
+      if (isPedalCode(e.code)) {
+        if (e.code === 'Space' && target.closest('button')) return;
         e.preventDefault();
+        pedalPressed.current.add(e.code);
         actions.current.pedal(true);
         return;
       }
@@ -682,8 +681,9 @@ export default function Keys() {
       }
     };
     const up = (e: KeyboardEvent) => {
-      if (e.code === 'Space') {
-        actions.current.pedal(false);
+      if (isPedalCode(e.code)) {
+        pedalPressed.current.delete(e.code);
+        actions.current.pedal(pedalPressed.current.size > 0);
       }
       if (pressed.current.has(e.code)) {
         pressed.current.delete(e.code);
@@ -1168,8 +1168,8 @@ export default function Keys() {
           </div>
           <div className="keyboard-footer">
             <span>
-              <kbd>SPACE</kbd> {tr('Hold to sustain', '押してサステイン')}{' '}
-              <i>·</i> <kbd>←</kbd>
+              <kbd>SHIFT</kbd> / <kbd>SPACE</kbd>{' '}
+              {tr('Hold to sustain', '押してサステイン')} <i>·</i> <kbd>←</kbd>
               <kbd>→</kbd> {tr('Octave', 'オクターブ')}
             </span>
             <Button variant="ghost" className="panic" onClick={panic}>
@@ -1276,8 +1276,8 @@ export default function Keys() {
                   <small>
                     {pedal
                       ? tr(
-                          'Space pedal is down',
-                          'スペースキーのペダルを押しています',
+                          'Shift / Space pedal is down',
+                          'Shift / Spaceのペダルを押しています',
                         )
                       : tr(
                           'Keep notes ringing after release',
@@ -1652,16 +1652,17 @@ export default function Keys() {
             <p>
               {language === 'ja' ? (
                 <>
-                  <kbd>Space</kbd> はサステインペダル、<kbd>←</kbd> /{' '}
-                  <kbd>→</kbd> はオクターブ移動、<kbd>Esc</kbd> は全音停止です。
+                  <kbd>Shift</kbd> または <kbd>Space</kbd> はサステインペダル、
+                  <kbd>←</kbd> / <kbd>→</kbd> はオクターブ移動、<kbd>Esc</kbd>{' '}
+                  は全音停止です。
                   日本語入力がキーを受け取らないよう、英語入力に切り替えてください。
                 </>
               ) : (
                 <>
-                  <kbd>Space</kbd> is your sustain pedal. <kbd>←</kbd> /{' '}
-                  <kbd>→</kbd> shift octaves. <kbd>Esc</kbd> stops all notes.
-                  Use an English input source; Japanese IME composition can
-                  intercept keys.
+                  <kbd>Shift</kbd> or <kbd>Space</kbd> is your sustain pedal.{' '}
+                  <kbd>←</kbd> / <kbd>→</kbd> shift octaves. <kbd>Esc</kbd>{' '}
+                  stops all notes. Use an English input source; Japanese IME
+                  composition can intercept keys.
                 </>
               )}
             </p>

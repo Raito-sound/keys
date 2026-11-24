@@ -19,7 +19,7 @@ Open http://localhost:18768 and click **Start playing**. Piano samples begin loa
 - Compact viewport-oriented layout, optional fullscreen button, and a collapsible recorder beneath the play settings and metronome.
 - Sampled grand piano and additive tonewheel-style organ.
 - Touch/mouse piano keyboard with pointer capture, glissando and multi-touch.
-- Independent note releases, sustain latch/Space pedal, octave shift and ±12-semitone transpose.
+- Independent note releases, sustain latch/Shift or Space pedal, octave shift and ±12-semitone transpose.
 - Chord labels, sounding-note names and a live waveform.
 - Volume, tone, room reverb and fixed keyboard velocity.
 - Web Audio-clock metronome: 30–240 BPM, tap tempo, 2–7 beats, quarter/eighth/triplet/sixteenth divisions and click level.
