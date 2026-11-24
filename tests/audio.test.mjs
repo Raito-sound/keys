@@ -143,3 +143,24 @@ test('polyphonic voices have independent release and future notes are cancellabl
     globalThis.fetch = priorFetch;
   }
 });
+
+test('organ fallback can start without downloading piano samples', async () => {
+  const priorContext = globalThis.AudioContext,
+    priorFetch = globalThis.fetch;
+  let fetchCount = 0;
+  globalThis.AudioContext = Context;
+  globalThis.fetch = async () => {
+    fetchCount++;
+    throw new Error('offline');
+  };
+  try {
+    const engine = new KeyboardAudio();
+    await engine.start(undefined, false);
+    assert.equal(engine.context.resumeCount, 1);
+    assert.equal(fetchCount, 0);
+    assert.equal(engine.buffers.size, 0);
+  } finally {
+    globalThis.AudioContext = priorContext;
+    globalThis.fetch = priorFetch;
+  }
+});

@@ -197,10 +197,11 @@ export class KeyboardAudio {
     }
     return this.loading;
   }
-  async start(onProgress: (n: number) => void = () => {}) {
+  async start(onProgress: (n: number) => void = () => {}, loadPiano = true) {
     const context = this.ensureContext();
     const resumed = context.resume();
-    await Promise.all([resumed, this.preload(onProgress)]);
+    if (loadPiano) await Promise.all([resumed, this.preload(onProgress)]);
+    else await resumed;
   }
   setPatch(patch: Patch) {
     this.patch = { ...patch };

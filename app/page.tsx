@@ -37,6 +37,11 @@ import {
 } from '@/components/ui/dialog';
 import { KeyboardAudio } from '@/lib/audio';
 import { isPedalCode, shouldIgnoreInstrumentKey } from '@/lib/keyboard';
+import {
+  parseSettings,
+  serializeSettings,
+  SETTINGS_STORAGE_KEY,
+} from '@/lib/settings';
 import { registerInstrumentTools } from '@/lib/webmcp';
 import {
   KEY_CODES,
@@ -137,6 +142,7 @@ function Control({
 export default function Keys() {
   const [language, setLanguage] = useState<Language>('en');
   const [languageReady, setLanguageReady] = useState(false);
+  const [settingsReady, setSettingsReady] = useState(false);
   const tr = (english: string, japanese: string) =>
     language === 'ja' ? japanese : english;
   const [audio] = useState(() => new KeyboardAudio());
@@ -366,29 +372,42 @@ export default function Keys() {
     setPlayNotes([]);
     setElapsed(0);
   };
-  async function enable() {
+  async function enable(organFallback = false) {
     if (audioState === 'loading') return;
     setAudioState('loading');
     setMessage(
-      sampleState === 'ready'
-        ? tr('Enabling audio…', '音声を有効にしています…')
-        : tr('Finishing piano setup…', 'ピアノ音源の準備を完了しています…'),
+      organFallback
+        ? tr('Starting the organ…', 'オルガンを開始しています…')
+        : sampleState === 'ready'
+          ? tr('Enabling audio…', '音声を有効にしています…')
+          : tr('Finishing piano setup…', 'ピアノ音源の準備を完了しています…'),
     );
     try {
-      await audio.start(setProgress);
-      setSampleState('ready');
+      if (organFallback) {
+        const nextPatch = { ...patch, instrument: 'organ' as const };
+        current.current.patch = nextPatch;
+        setPatch(nextPatch);
+        audio.setPatch(nextPatch);
+      }
+      await audio.start(setProgress, !organFallback);
+      if (!organFallback) setSampleState('ready');
       setAudioState('ready');
       setMessage(
-        tr(
-          'Ready. Play the letter keys, or touch the piano.',
-          '準備完了。英字キーまたは画面の鍵盤で演奏できます。',
-        ),
+        organFallback
+          ? tr(
+              'Organ ready. Reload later to retry the piano samples.',
+              'オルガンを演奏できます。ピアノ音源は次回の再読み込みで再試行できます。',
+            )
+          : tr(
+              'Ready. Play the letter keys, or touch the piano.',
+              '準備完了。英字キーまたは画面の鍵盤で演奏できます。',
+            ),
       );
     } catch (e) {
       setSampleState('error');
       setAudioState('error');
       setMessage(
-        e instanceof Error
+        language !== 'ja' && e instanceof Error
           ? e.message
           : tr(
               'Audio could not start. Please retry.',
@@ -577,12 +596,37 @@ export default function Keys() {
           saved.notes.sort((a, b) => a.time - b.time);
           setTake(saved);
         }
-        setDark(localStorage.getItem('keys.theme') === 'dark');
       } catch {
         /* storage is optional */
       }
+      try {
+        setDark(localStorage.getItem('keys.theme') === 'dark');
+        const settings = parseSettings(
+          localStorage.getItem(SETTINGS_STORAGE_KEY),
+        );
+        if (settings) {
+          setPatch(settings.patch);
+          setBase(settings.base);
+          setBpm(settings.bpm);
+        }
+      } catch {
+        /* storage is optional */
+      } finally {
+        setSettingsReady(true);
+      }
     });
   }, []);
+  useEffect(() => {
+    if (!settingsReady) return;
+    try {
+      localStorage.setItem(
+        SETTINGS_STORAGE_KEY,
+        serializeSettings({ patch, base, bpm }),
+      );
+    } catch {
+      /* storage is optional */
+    }
+  }, [base, bpm, patch, settingsReady]);
   useEffect(() => {
     queueMicrotask(() => {
       const requested = new URLSearchParams(window.location.search).get('lang');
@@ -997,14 +1041,24 @@ export default function Keys() {
                 <progress max="1" value={progress}>
                   {Math.round(progress * 100)}%
                 </progress>
-                <Button onClick={enable} disabled={audioState === 'loading'}>
-                  <Play />
-                  {audioState === 'loading'
-                    ? tr('STARTING…', '開始しています…')
-                    : sampleState === 'error'
-                      ? tr('RETRY & START', '再試行してはじめる')
-                      : tr('START PLAYING', '演奏をはじめる')}
-                </Button>
+                <div className="audio-gate-actions">
+                  <Button
+                    onClick={() => enable()}
+                    disabled={audioState === 'loading'}
+                  >
+                    <Play />
+                    {audioState === 'loading'
+                      ? tr('STARTING…', '開始しています…')
+                      : sampleState === 'error'
+                        ? tr('RETRY PIANO', 'ピアノを再試行')
+                        : tr('START PLAYING', '演奏をはじめる')}
+                  </Button>
+                  {sampleState === 'error' && audioState !== 'loading' && (
+                    <Button variant="secondary" onClick={() => enable(true)}>
+                      <Waves /> {tr('START WITH ORGAN', 'オルガンですぐ始める')}
+                    </Button>
+                  )}
+                </div>
                 <small>
                   {tr(
                     'One click is required by your browser before sound can play.',
@@ -1022,7 +1076,9 @@ export default function Keys() {
               <Button
                 variant={patch.instrument === 'piano' ? 'default' : 'ghost'}
                 aria-pressed={patch.instrument === 'piano'}
-                disabled={busy}
+                disabled={
+                  busy || (audioState === 'ready' && sampleState === 'error')
+                }
                 onClick={() => {
                   releaseAll();
                   setPatch({ ...patch, instrument: 'piano' });

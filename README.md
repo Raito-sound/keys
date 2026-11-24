@@ -22,6 +22,8 @@ Open http://localhost:18768 and click **Start playing**. Piano samples begin loa
 - Independent note releases, sustain latch/Shift or Space pedal, octave shift and ±12-semitone transpose.
 - Chord labels, sounding-note names and a live waveform.
 - Volume, tone, room reverb and fixed keyboard velocity.
+- Sound, instrument, octave and tempo settings persist on the current device.
+- If piano samples fail to load, the synthesized organ remains available immediately.
 - Web Audio-clock metronome: 30–240 BPM, tap tempo, 2–7 beats, quarter/eighth/triplet/sixteenth divisions and click level.
 - Up to 90-second takes, optional one-bar count-in, looped playback, browser-local take persistence.
 - Standard MIDI file export and stereo 44.1 kHz / 16-bit PCM WAV rendering. Exports omit the metronome. Sustain is captured as note duration.

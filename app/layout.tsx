@@ -6,13 +6,15 @@ export const metadata: Metadata = {
   description:
     'Play piano and organ in your browser for free. Practice with a metronome, record short musical ideas and export MIDI or WAV. No installation required.',
   metadataBase: new URL('https://keys.raito.studio'),
+  icons: { icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }] },
   alternates: { canonical: '/' },
   robots: { index: true, follow: true },
   openGraph: {
     type: 'website',
     url: 'https://keys.raito.studio/',
     title: 'KEYS — Online Piano & Organ with Recording',
-    description: 'Play, practice and capture musical ideas. Free browser piano and organ with MIDI and WAV export.',
+    description:
+      'Play, practice and capture musical ideas. Free browser piano and organ with MIDI and WAV export.',
     siteName: 'Raito Studio Tools',
   },
   twitter: { card: 'summary' },

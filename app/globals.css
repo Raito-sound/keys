@@ -581,7 +581,11 @@ kbd {
 .audio-gate-card progress::-webkit-progress-value {
   background: var(--primary);
 }
-.audio-gate-card button {
+.audio-gate-actions {
+  display: grid;
+  gap: 8px;
+}
+.audio-gate-actions button {
   min-width: 210px;
   min-height: 44px;
   gap: 8px;
